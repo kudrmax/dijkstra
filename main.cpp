@@ -8,7 +8,9 @@ int main(int arg_count, char* arg_vars[]) {
 //        std::cout << file << std::endl;
 //        std::cout << from << std::endl;
 //        std::cout << to << std::endl;
-        dijkstra::read_graph(file);
+        auto gr = dijkstra::read_graph(file);
+        gr.print();
+
     } catch(std::exception& ex){
         dijkstra::print(ex);
         return 1;
