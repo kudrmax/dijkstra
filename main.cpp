@@ -5,9 +5,10 @@
 int main(int arg_count, char* arg_vars[]) {
     try{
         auto [file, from, to] = dijkstra::parse_args(arg_count, arg_vars);
-        std::cout << file << std::endl;
-        std::cout << from << std::endl;
-        std::cout << to << std::endl;
+//        std::cout << file << std::endl;
+//        std::cout << from << std::endl;
+//        std::cout << to << std::endl;
+        dijkstra::read_graph(file);
     } catch(std::exception& ex){
         dijkstra::print(ex);
         return 1;

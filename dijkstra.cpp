@@ -1,5 +1,6 @@
 #include "dijkstra.h"
 #include <sstream>
+#include <fstream>
 
 //void dijkstra::print_results(weight_t weight, const route_t& route) {
 //    std::cout << "route:";
@@ -39,4 +40,38 @@ std::tuple<const char*, dijkstra::node_name_t, dijkstra::node_name_t> dijkstra::
 
 void dijkstra::print(const std::exception& ex) noexcept {
     std::cout << ex.what() << std::endl;
+}
+
+dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
+    using namespace std::string_literals;
+
+    double d;
+    graph::Graph<node_name_t, node_data_t, weight_t> gr;
+    std::string str;
+
+    std::ifstream fin(file_name);
+    if (!fin.is_open())
+        throw std::runtime_error("Can't open file named: "s + file_name);
+
+    std::vector<double> vec;
+    for (std::string str; std::getline(fin, str);) {
+        std::cout << str << std::endl;
+
+        if (str.back() == '|' || str.back() == '/' || str.back() == '\\')
+            str.pop_back();
+        if (str.front() == '|' || str.front() == '/' || str.front() == '\\')
+            str.erase(str.begin());
+
+        std::istringstream iss;
+        iss.str(str);
+        while (iss >> d)
+            vec.push_back(d);
+        if (!iss.eof())
+            std::cout << "ERRORRR!\n";
+
+        for (const auto el: vec)
+            std::cout << el << std::endl;
+        vec.clear();
+    }
+    return gr;
 }
