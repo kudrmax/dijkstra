@@ -52,11 +52,14 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
     graph::Graph<node_name_t, node_data_t, weight_t> gr;
     std::vector<double> vec;
     double d;
-    size_t count = 0;
-    size_t size = 0;
-    size_t k = 0;
-    for (std::string str; std::getline(fin, str); ++k) {
+    size_t count_columns = 0;
+    size_t size_of_matrix = 0;
+    size_t count_rows = 0;
+
+    for (std::string str; std::getline(fin, str); ++count_rows) {
+
         std::cout << str << std::endl;
+
         if (str.back() == '|' || str.back() == '/' || str.back() == '\\')
             str.pop_back();
         if (str.front() == '|' || str.front() == '/' || str.front() == '\\')
@@ -64,23 +67,22 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
 
         std::istringstream iss;
         iss.str(str);
-        count = 0;
-        while (iss >> d) {
+
+        for (count_columns = 0; iss >> d; ++count_columns)
             vec.push_back(d);
-            ++count;
-        }
+
         if (!iss.eof())
             throw std::runtime_error("There is no correct symbol");
-        if(k == 0)
-            size = count;
-        else if (size != count)
+        if (count_rows == 0)
+            size_of_matrix = count_columns;
+        else if (size_of_matrix != count_columns)
             throw std::runtime_error("Matrix should be square");
 
         for (const auto el: vec)
-                std::cout << el << std::endl;
+            std::cout << el << std::endl;
         vec.clear();
     }
-    if(k != count)
+    if (count_rows != size_of_matrix)
         throw std::runtime_error("Matrix should be square");
     return gr;
 }
