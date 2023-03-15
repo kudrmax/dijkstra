@@ -96,24 +96,31 @@ void dijkstra::print(const std::exception& ex) noexcept {
 //    return gr;
 //}
 
-size_t add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row) {
-    const auto INF = std::numeric_limits<int>::infinity();
-    std::cout << str << std::endl;
+void add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row, size_t size_of_matrix) {
+    if (row > size_of_matrix)
+        throw std::runtime_error("row > size_of_matrix");
     dijkstra::weight_t weight;
     size_t column = 0;
     std::istringstream iss;
     iss.str(str);
-    for (; iss >> weight; ++column) {
-        if (row == 0) {
-            gr.insert_node(column, { INF, 0 });
-        }
-        if (weight != 0) {
+    for (; iss >> weight; ++column)
+        if (weight != 0 && column <= size_of_matrix)
             gr.insert_edge({ row, column }, weight);
-        }
-    }
+    if (column - 1 != size_of_matrix)
+        throw std::runtime_error("column != size_of_matrix");
     if (!iss.eof())
         throw std::runtime_error("There is no correct symbol");
-    std::cout << "column: " << column << std::endl;
+}
+
+
+size_t add_node_to_graph_from_string(dijkstra::graph_t& gr, std::string& str) {
+    const auto INF = std::numeric_limits<int>::infinity();
+    size_t column = 0;
+    std::istringstream iss;
+    iss.str(str);
+    dijkstra::weight_t weight;
+    for (; iss >> weight; ++column)
+        gr.insert_node(column, { INF, 0 });
     return column - 1;
 }
 
@@ -129,24 +136,15 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
     std::string str;
     size_t column_first = 0;
     size_t column_this = 0;
+    size_t size_of_matrix = 0;
 
     for (; std::getline(fin, str); ++row) {
-        if(row > column_first)
-            throw std::runtime_error("row if bigger");
         delete_slashes(str);
-        if (row == 0) {
-            column_first = add_string_to_graph(gr, str, row);
-            column_this = column_first;
-        } else
-            column_this = add_string_to_graph(gr, str, row);
-        if (column_this != column_first) {
-            throw std::runtime_error("Matrix should be square 1");
-        }
-        std::cout << "column_first: " << column_first << std::endl;
-        std::cout << "row: " << row << std::endl;
+        if (row == 0)
+            size_of_matrix = add_node_to_graph_from_string(gr, str);
+        add_string_to_graph(gr, str, row, size_of_matrix);
     }
-    std::cout << "row_f: " << row << std::endl;
-    if (row - 1 != column_first)
-        throw std::runtime_error("Matrix should be square 2");
+    if (row - 1 != size_of_matrix)
+        throw std::runtime_error("row < size_of_matrix");
     return gr;
 }
