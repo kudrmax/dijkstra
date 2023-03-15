@@ -45,18 +45,18 @@ void dijkstra::print(const std::exception& ex) noexcept {
 dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
     using namespace std::string_literals;
 
-    double d;
-    graph::Graph<node_name_t, node_data_t, weight_t> gr;
-    std::string str;
-
     std::ifstream fin(file_name);
     if (!fin.is_open())
         throw std::runtime_error("Can't open file named: "s + file_name);
 
+    graph::Graph<node_name_t, node_data_t, weight_t> gr;
     std::vector<double> vec;
-    for (std::string str; std::getline(fin, str);) {
+    double d;
+    size_t count = 0;
+    size_t size = 0;
+    size_t k = 0;
+    for (std::string str; std::getline(fin, str); ++k) {
         std::cout << str << std::endl;
-
         if (str.back() == '|' || str.back() == '/' || str.back() == '\\')
             str.pop_back();
         if (str.front() == '|' || str.front() == '/' || str.front() == '\\')
@@ -64,14 +64,23 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
 
         std::istringstream iss;
         iss.str(str);
-        while (iss >> d)
+        count = 0;
+        while (iss >> d) {
             vec.push_back(d);
+            ++count;
+        }
         if (!iss.eof())
-            std::cout << "ERRORRR!\n";
+            throw std::runtime_error("There is no correct symbol");
+        if(k == 0)
+            size = count;
+        else if (size != count)
+            throw std::runtime_error("Matrix should be square");
 
         for (const auto el: vec)
-            std::cout << el << std::endl;
+                std::cout << el << std::endl;
         vec.clear();
     }
+    if(k != count)
+        throw std::runtime_error("Matrix should be square");
     return gr;
 }
