@@ -118,23 +118,11 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
     it_from->second.value() = { 0, 0 };
     (++it_from)->second.value() = { 1, 0 };
 
-    auto min_ver = gr.begin();
-    auto min_ver_value = min_ver->second.value().first;
-    for (auto it = gr.begin(); it != gr.end(); ++it) {
-        if (it->second.value().first < min_ver_value) {
-            min_ver = it;
-            min_ver_value = it->second.value().first;
-        }
-    }
-    std::cout << "min_ver_value: " << min_ver_value << std::endl;
-    auto test = std::min_element(gr.begin(), gr.end(), MyLess());
-    std::cout << "test: " << test->second.value().first << std::endl;
-    auto test2 = std::min_element(gr.begin(), gr.end(),
+    auto min_ver = std::min_element(gr.begin(), gr.end(),
                                   [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> it1,
                                      std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> it2) {
                                       return it1.second.value().first < it2.second.value().first;
                                   });
-    std::cout << "test2: " << test2->second.value().first << std::endl;
 
     return { 5, { 5 }};
 }

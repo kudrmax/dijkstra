@@ -7,6 +7,8 @@
 namespace dijkstra {
     using node_name_t = typename std::size_t;
     using node_data_t = typename std::pair<double, double>;
+//    using node_data_t = typename std::unordered_map<std::string, double>;
+//    using node_data_t = typename std::pair<double, double>;
     using weight_t = double;
     using graph_t = typename graph::Graph<node_name_t, node_data_t, weight_t>;
     using route_t = std::vector<node_name_t>;
@@ -16,5 +18,11 @@ namespace dijkstra {
     std::pair<weight_t, route_t> dijkstra_algorithm(const graph_t& graph, node_name_t key_from, node_name_t key_to);
     void print_results(weight_t, const route_t&);
     void print(const std::exception& ex) noexcept;
+
+    struct NodeData{
+        weight_t weight_node;
+        node_name_t who_change;
+        bool is_passed = false;
+    };
 }
 
