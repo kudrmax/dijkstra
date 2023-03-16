@@ -6,9 +6,10 @@ int main(int arg_count, char* arg_vars[]) {
     try {
         auto [file, from, to] = dijkstra::parse_args(arg_count, arg_vars);
         auto gr = dijkstra::read_graph(file);
-        gr.print();
+//        gr.print();
+        print(gr);
         dijkstra::dijkstra_algorithm(gr, 2, 1);
-        gr.print();
+//        gr.print();
     } catch (std::exception& ex) {
         dijkstra::print(ex);
         return 1;
