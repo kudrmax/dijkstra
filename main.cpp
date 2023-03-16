@@ -3,15 +3,13 @@
 #include <fstream>
 
 int main(int arg_count, char* arg_vars[]) {
-    try{
+    try {
         auto [file, from, to] = dijkstra::parse_args(arg_count, arg_vars);
-//        std::cout << file << std::endl;
-//        std::cout << from << std::endl;
-//        std::cout << to << std::endl;
         auto gr = dijkstra::read_graph(file);
         gr.print();
-
-    } catch(std::exception& ex){
+        dijkstra::dijkstra_algorithm(gr, 2, 1);
+        gr.print();
+    } catch (std::exception& ex) {
         dijkstra::print(ex);
         return 1;
     }

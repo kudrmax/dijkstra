@@ -2,13 +2,13 @@
 #include <sstream>
 #include <fstream>
 
-//void dijkstra::print_results(weight_t weight, const route_t& route) {
-//    std::cout << "route:";
-//    for (auto const& key: route)
-//        std::cout << " " << key;
-//    std::cout << std::endl;
-//    std::cout << "weight: " << weight << std::endl;
-//}
+void dijkstra::print_results(weight_t weight, const route_t& route) {
+    std::cout << "route:";
+    for (auto const& key: route)
+        std::cout << " " << key;
+    std::cout << std::endl;
+    std::cout << "weight: " << weight << std::endl;
+}
 
 void delete_slashes(std::string& str) {
     if (str.back() == '|' || str.back() == '/' || str.back() == '\\')
@@ -49,53 +49,6 @@ void dijkstra::print(const std::exception& ex) noexcept {
     std::cout << ex.what() << std::endl;
 }
 
-//void add_row_to_graph(dijkstra::graph_t& gr, std::string& str) {
-//
-//    std::vector<double> vec;
-//    double d;
-//    size_t count_columns = 0;
-//    size_t size_of_matrix = 0;
-//    size_t count_rows = 0;
-//
-//    std::cout << str << std::endl;
-//    delete_slashes(str);
-//
-//    std::istringstream iss;
-//    iss.str(str);
-//
-//    for (count_columns = 0; iss >> d; ++count_columns)
-//        vec.push_back(d);
-//
-//    if (!iss.eof())
-//        throw std::runtime_error("There is no correct symbol");
-//    if (count_rows == 0)
-//        size_of_matrix = count_columns;
-//    else if (size_of_matrix != count_columns)
-//        throw std::runtime_error("Matrix should be square");
-//
-//    for (const auto el: vec)
-//        std::cout << el << std::endl;
-//    vec.clear();
-//}
-//
-//
-//dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
-//    using namespace std::string_literals;
-//
-//    std::ifstream fin(file_name);
-//    if (!fin.is_open())
-//        throw std::runtime_error("Can't open file named: "s + file_name);
-//
-//    dijkstra::graph_t gr;
-//
-//    for (std::string str; std::getline(fin, str); ++count_rows) {
-//        add_row_to_graph(gr, str);
-//    }
-//    if (count_rows != size_of_matrix)
-//        throw std::runtime_error("Matrix should be square");
-//    return gr;
-//}
-
 void add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row, size_t size_of_matrix) {
     if (row > size_of_matrix)
         throw std::runtime_error("row > size_of_matrix");
@@ -114,13 +67,13 @@ void add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row, si
 
 
 size_t add_node_to_graph_from_string(dijkstra::graph_t& gr, std::string& str) {
-    const auto INF = std::numeric_limits<int>::infinity();
+    const double INF = std::numeric_limits<double>::infinity();
     size_t column = 0;
     std::istringstream iss;
     iss.str(str);
     dijkstra::weight_t weight;
     for (; iss >> weight; ++column)
-        gr.insert_node(column, { INF, 0 });
+        gr.insert_node(column, { INF, INF });
     return column - 1;
 }
 
@@ -147,4 +100,24 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
     if (row - 1 != size_of_matrix)
         throw std::runtime_error("row < size_of_matrix");
     return gr;
+}
+
+std::pair<dijkstra::weight_t, dijkstra::route_t>
+dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_t key_to) {
+    const double INF = std::numeric_limits<double>::infinity();
+    auto it_from = gr.find(key_from);
+    it_from->second.value() = { 0, 0 };
+
+    auto min_ver = gr.begin();
+    auto min_ver_value = min_ver->second.value().first;
+//    for (const auto& pair: gr) {
+    for (auto it = gr.begin(); it != gr.end(); ++it) {
+        if (it->second.value().first < min_ver_value) {
+            min_ver = it;
+            min_ver_value = it->second.value().first;
+        }
+    }
+    std::cout << "min_ver_value: " << min_ver_value <<std::endl;
+
+    return { 5, { 5 }};
 }
