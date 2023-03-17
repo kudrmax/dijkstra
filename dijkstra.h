@@ -3,17 +3,22 @@
 #include "/Users/kudr.max/CLionProjects/Graph/sources/graph.h"
 #include <vector>
 #include <iostream>
+#include <optional>
+
+// прием с mutable норм?
+// какой тип сделать who_change? (аналог INF)
 
 namespace dijkstra {
     using node_name_t = typename std::size_t;
     using weight_t = double;
-    struct NodeData { ;
-        weight_t weight_node;
-        node_name_t who_change;
+    struct NodeData {
+        struct who_change_t {
+            bool is_changed = false;
+            node_name_t who;
+        };
+        weight_t weight_node = std::numeric_limits<double>::infinity();
+        who_change_t who_change;
         bool is_passed = false;
-        void print() const{
-            std::cout << "{ " << weight_node << ", " << who_change << ", " << is_passed << " }" << std::endl;
-        }
     };
     using node_data_t = NodeData;
     using graph_t = typename graph::Graph<node_name_t, node_data_t, weight_t>;

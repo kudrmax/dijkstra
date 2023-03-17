@@ -107,10 +107,10 @@ std::pair<dijkstra::weight_t, dijkstra::route_t>
 dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_t key_to) {
     const double INF = std::numeric_limits<double>::infinity();
     auto it_from_zero = gr.find(key_from);
-    for(const auto& pair : gr) {
+    for (const auto& pair: gr) {
         pair.second.value().weight_node = INF;
         pair.second.value().is_passed = false;
-        pair.second.value().who_change = 0;
+        pair.second.value().who_change = { 0, false };
     }
     it_from_zero->second.value() = { 0, 0 };
     for (size_t i = 0; i < gr.size(); ++i) {
@@ -146,7 +146,7 @@ void dijkstra::print(const dijkstra::node_data_t& val) noexcept {
     std::cout << "{ " <<
               val.weight_node << ", " <<
               val.is_passed << ", " <<
-              val.who_change << " }";
+              val.who_change.who << " }";
 }
 
 void dijkstra::print(const std::pair<key_t, dijkstra::graph_t::Node>& pair, std::string str) noexcept {
