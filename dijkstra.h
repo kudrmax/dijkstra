@@ -7,12 +7,13 @@
 namespace dijkstra {
     using node_name_t = typename std::size_t;
     using weight_t = double;
-//    using node_data_t = typename std::pair<double, double>;
-    struct NodeData{
+    struct NodeData { ;
         weight_t weight_node;
         node_name_t who_change;
         bool is_passed = false;
-        void print() const { std::cout << "{ " << weight_node << ", " << who_change << ", " << is_passed << " }" << std::endl;}
+        void print() const{
+            std::cout << "{ " << weight_node << ", " << who_change << ", " << is_passed << " }" << std::endl;
+        }
     };
     using node_data_t = NodeData;
     using graph_t = typename graph::Graph<node_name_t, node_data_t, weight_t>;
