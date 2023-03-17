@@ -121,10 +121,11 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
     auto min_ver = std::min_element(gr.begin(), gr.end(),
                                     [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
                                        std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
-                                        return (node1.second.value().weight_node < node2.second.value().weight_node)
-                                        && !node1.second.value().is_passed && !node2.second.value().is_passed;
+                                        return !node1.second.value().is_passed &&
+                                               !node2.second.value().is_passed &&
+                                               (node1.second.value().weight_node < node2.second.value().weight_node);
                                     });
-
+    print(*min_ver);
     return { 5, { 5 }};
 }
 
@@ -135,15 +136,19 @@ void dijkstra::print(const dijkstra::node_data_t& val) noexcept {
               val.who_change << " }";
 }
 
+void dijkstra::print(const std::pair<key_t, dijkstra::graph_t::Node>& pair, std::string str) noexcept {
+    std::cout << "" << pair.first << ": ";
+    print(pair.second.value());
+    std::cout << std::endl;
+    for (auto const& edges: pair.second.get_edge()) {
+        std::cout << " —> " << edges.first << " (" << edges.second << ")" << std::endl;
+    }
+}
+
 void dijkstra::print(const dijkstra::graph_t& gr) noexcept {
     std::cout << "GRAPHHH\n" << std::endl;
     for (auto const& pair: gr) {
-        std::cout << "" << pair.first << ": ";
-        print(pair.second.value());
-        std::cout << std::endl;
-        for (auto const& edges: pair.second.get_edge()) {
-            std::cout << " —> " << edges.first << " (" << edges.second << ")" << std::endl;
-        }
+        print(pair);
     }
     std::cout << std::endl;
 }

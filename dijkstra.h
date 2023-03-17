@@ -24,6 +24,7 @@ namespace dijkstra {
     void print_results(weight_t, const route_t&);
     void print(const std::exception& ex) noexcept;
     void print(const graph_t& gr) noexcept;
-    void print(const NodeData& gr) noexcept;
+    void print(const std::pair<key_t, dijkstra::graph_t::Node>& pair, std::string str = "") noexcept;
+    void print(const NodeData&) noexcept;
 }
 
