@@ -115,18 +115,15 @@ std::pair<dijkstra::weight_t, dijkstra::route_t>
 dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_t key_to) {
     const double INF = std::numeric_limits<double>::infinity();
     auto it_from_zero = gr.find(key_from);
+    for(const auto& pair : gr) {
+        pair.second.value().weight_node = INF;
+        pair.second.value().is_passed = false;
+        pair.second.value().who_change = 0;
+    }
     it_from_zero->second.value() = { 0, 0 };
 
-//    size_t count_passed = 0;
-//    for (const auto& pair: gr) {
-//        if (pair.second.value().is_passed)
-//            ++count_passed;
-//    }
-//    if(count_passed == gr.size());
     for (size_t i = 0; i < gr.size(); ++i) {
         auto min_ver = std::min_element(gr.begin(), gr.end(),
-//                                        [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
-//                                           std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
                                         [](auto node1, auto node2) {
                                             bool return_val;
                                             if (node2.second.value().is_passed)
@@ -137,8 +134,7 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
                                                     node2.second.value().weight_node);
                                         }
         );
-//        print(*min_ver, "*min_ver: \n");
-        std::cout << "ver: " << min_ver->first << std::endl;
+//        std::cout << "ver: " << min_ver->first << std::endl;
         for (const auto& edge_pair: min_ver->second) {
             auto weight_of_edge_to = edge_pair.second;
             auto from_edge = min_ver->first;
@@ -148,33 +144,20 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
             auto it_to = gr.find(to_edge);
             auto& weight_of_node_to = it_to->second.value().weight_node;
             auto sum = weight_of_node_from + weight_of_edge_to;
-            std::cout << weight_of_node_from << " + " << weight_of_edge_to << " < " << weight_of_node_to << std::endl;
+//            std::cout << weight_of_node_from << " + " << weight_of_edge_to << " < " << weight_of_node_to << std::endl;
             if (!it_to->second.value().is_passed && sum < weight_of_node_to) {
-                std::cout << "changed" << std::endl;
+//                std::cout << "changed" << std::endl;
                 weight_of_node_to = sum;
-            } else
-                std::cout << "NOT changed" << std::endl;
-
-//        std::cout << "from_edge: " << from_edge << std::endl;
-//        std::cout << "to_edge: " << to_edge << std::endl;
-//        auto it_from = gr.find(from_edge);
-//        std::cout << "weight_of_node_to: " << weight_of_node_to << std::endl;
-//        std::cout << "weight_of_node_from: " << weight_of_node_from << std::endl;
-//        std::cout << "weight_of_edge: " << weight_of_edge_to << std::endl;
-//            std::cout << std::endl;
+            }
+//                std::cout << "NOT changed" << std::endl;
         }
         min_ver->second.value().is_passed = true;
-        std::cout << "\nIteration = " << i << std::endl;
-        print(gr);
+//        std::cout << "\nIteration = " << i << std::endl;
+//        print(gr);
+//        if(min_ver == gr.find(key_to)) break;
+
     }
-//    auto route = std::max_element(gr.begin(), gr.end(),
-////                                        [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
-////                                           std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
-//                                    [](auto node1, auto node2) {
-//                                        return (node1.second.value().weight_node <
-//                                                node2.second.value().weight_node);
-//                                    }
-//    );
+
     auto route = gr.find(key_to);
     return { route->second.value().weight_node, { 5 }};
 }
