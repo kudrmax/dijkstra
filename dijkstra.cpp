@@ -114,8 +114,8 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
 std::pair<dijkstra::weight_t, dijkstra::route_t>
 dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_t key_to) {
     const double INF = std::numeric_limits<double>::infinity();
-    auto it_from = gr.find(key_from);
-    it_from->second.value() = { 0, 0 };
+    auto it_from_zero = gr.find(key_from);
+    it_from_zero->second.value() = { 0, 0 };
 
 //    size_t count_passed = 0;
 //    for (const auto& pair: gr) {
@@ -167,14 +167,15 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
         std::cout << "\nIteration = " << i << std::endl;
         print(gr);
     }
-    auto route = std::max_element(gr.begin(), gr.end(),
-//                                        [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
-//                                           std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
-                                    [](auto node1, auto node2) {
-                                        return (node1.second.value().weight_node <
-                                                node2.second.value().weight_node);
-                                    }
-    );
+//    auto route = std::max_element(gr.begin(), gr.end(),
+////                                        [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
+////                                           std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
+//                                    [](auto node1, auto node2) {
+//                                        return (node1.second.value().weight_node <
+//                                                node2.second.value().weight_node);
+//                                    }
+//    );
+    auto route = gr.find(key_to);
     return { route->second.value().weight_node, { 5 }};
 }
 

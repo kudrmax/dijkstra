@@ -7,7 +7,7 @@ int main(int arg_count, char* arg_vars[]) {
         auto [file, from, to] = dijkstra::parse_args(arg_count, arg_vars);
         auto gr = dijkstra::read_graph(file);
         print(gr);
-        auto[route, vec] = dijkstra::dijkstra_algorithm(gr, 2, 1);
+        auto [route, vec] = dijkstra::dijkstra_algorithm(gr, 2, 3);
         print(gr);
         std::cout << route << std::endl;
     } catch (std::exception& ex) {
