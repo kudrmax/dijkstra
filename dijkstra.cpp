@@ -125,13 +125,18 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
 //    if(count_passed == gr.size());
     for (size_t i = 0; i < gr.size(); ++i) {
         auto min_ver = std::min_element(gr.begin(), gr.end(),
-                                        [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
-                                           std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
+//                                        [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
+//                                           std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
+                                        [](auto node1, auto node2) {
+                                            bool return_val;
+                                            if (node2.second.value().is_passed)
+                                                return true;
+                                            if (node1.second.value().is_passed)
+                                                return false;
                                             return (node1.second.value().weight_node <
-                                                    node2.second.value().weight_node) &&
-                                                   !node1.second.value().is_passed &&
-                                                   !node2.second.value().is_passed;
-                                        });
+                                                    node2.second.value().weight_node);
+                                        }
+        );
 //        print(*min_ver, "*min_ver: \n");
         std::cout << "ver: " << min_ver->first << std::endl;
         for (const auto& edge_pair: min_ver->second) {
@@ -144,10 +149,12 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
             auto& weight_of_node_to = it_to->second.value().weight_node;
             auto sum = weight_of_node_from + weight_of_edge_to;
             std::cout << weight_of_node_from << " + " << weight_of_edge_to << " < " << weight_of_node_to << std::endl;
-            if (sum < weight_of_node_to) {
-//                std::cout << "changed" << std::endl;
+            if (!it_to->second.value().is_passed && sum < weight_of_node_to) {
+                std::cout << "changed" << std::endl;
                 weight_of_node_to = sum;
-            }
+            } else
+                std::cout << "NOT changed" << std::endl;
+
 //        std::cout << "from_edge: " << from_edge << std::endl;
 //        std::cout << "to_edge: " << to_edge << std::endl;
 //        auto it_from = gr.find(from_edge);
@@ -160,7 +167,15 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
         std::cout << "\nIteration = " << i << std::endl;
         print(gr);
     }
-    return { 5, { 5 }};
+    auto route = std::max_element(gr.begin(), gr.end(),
+//                                        [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
+//                                           std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
+                                    [](auto node1, auto node2) {
+                                        return (node1.second.value().weight_node <
+                                                node2.second.value().weight_node);
+                                    }
+    );
+    return { route->second.value().weight_node, { 5 }};
 }
 
 void dijkstra::print(const dijkstra::node_data_t& val) noexcept {
