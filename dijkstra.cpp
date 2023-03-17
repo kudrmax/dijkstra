@@ -103,27 +103,31 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
     return gr;
 }
 
+struct MyCompareForDijkstra {
+    bool operator()(dijkstra::node_pair_t node1, dijkstra::node_pair_t node2) {
+        if (node2.second.value().is_passed)
+            return true;
+        if (node1.second.value().is_passed)
+            return false;
+        return (node1.second.value().weight_node <
+                node2.second.value().weight_node);
+    }
+};
+
 std::pair<dijkstra::weight_t, dijkstra::route_t>
 dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_t key_to) {
     const double INF = std::numeric_limits<double>::infinity();
     auto it_from_zero = gr.find(key_from);
+
     for (const auto& pair: gr) {
         pair.second.value().weight_node = INF;
         pair.second.value().is_passed = false;
-        pair.second.value().who_change = { 0, false };
+        pair.second.value().who_change = { false };
     }
-    it_from_zero->second.value() = { 0, 0 };
+    it_from_zero->second.value().weight_node = 0;
+
     for (size_t i = 0; i < gr.size(); ++i) {
-        auto min_ver = std::min_element(gr.begin(), gr.end(),
-                                        [](auto node1, auto node2) {
-                                            if (node2.second.value().is_passed)
-                                                return true;
-                                            if (node1.second.value().is_passed)
-                                                return false;
-                                            return (node1.second.value().weight_node <
-                                                    node2.second.value().weight_node);
-                                        }
-        );
+        auto min_ver = std::min_element(gr.begin(), gr.end(), MyCompareForDijkstra());
         for (const auto& edge_pair: min_ver->second) {
             auto weight_of_edge_to = edge_pair.second;
             auto from_edge = min_ver->first;
@@ -133,13 +137,23 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
             auto it_to = gr.find(to_edge);
             auto& weight_of_node_to = it_to->second.value().weight_node;
             auto sum = weight_of_node_from + weight_of_edge_to;
-            if (!it_to->second.value().is_passed && sum < weight_of_node_to)
+            if (!it_to->second.value().is_passed && sum < weight_of_node_to) {
                 weight_of_node_to = sum;
+                it_to->second.value().who_change.is_changed = true;
+                it_to->second.value().who_change.who = it_from->first;
+            }
         }
         min_ver->second.value().is_passed = true;
     }
     auto route = gr.find(key_to);
-    return { route->second.value().weight_node, { 5 }};
+    std::vector<node_name_t> vec;
+
+    for (auto it = gr.find(key_to); it != gr.find(key_from); it = gr.find(it->second.value().who_change.who)) {
+        vec.push_back(it->first);
+    }
+    vec.push_back(key_from);
+    std::reverse(vec.begin(), vec.end());
+    return { route->second.value().weight_node, vec };
 }
 
 void dijkstra::print(const dijkstra::node_data_t& val) noexcept {
@@ -149,7 +163,7 @@ void dijkstra::print(const dijkstra::node_data_t& val) noexcept {
               val.who_change.who << " }";
 }
 
-void dijkstra::print(const std::pair<key_t, dijkstra::graph_t::Node>& pair, std::string str) noexcept {
+void dijkstra::print(const node_pair_t& pair, std::string str) noexcept {
     std::cout << str;
     std::cout << pair.first << ": ";
     print(pair.second.value());

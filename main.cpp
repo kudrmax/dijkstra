@@ -13,12 +13,16 @@ int main(int arg_count, char* arg_vars[]) {
 //        dijkstra::route_t vec;
 //        auto pair = dijkstra::dijkstra_algorithm(gr, 0, 0);
 
-        for (size_t i = 0; i < gr.size(); ++i) {
-            for (size_t j = 0; j < gr.size(); ++j) {
-                std::cout << i << " -> " << j << ": " << dijkstra::dijkstra_algorithm(gr, i, j).first << std::endl;
-            }
-            std::cout << std::endl;
-        }
+//        for (size_t i = 0; i < gr.size(); ++i) {
+//            for (size_t j = 0; j < gr.size(); ++j) {
+//                std::cout << i << " -> " << j << ": " << dijkstra::dijkstra_algorithm(gr, i, j).first << std::endl;
+//            }
+//            std::cout << std::endl;
+//        }
+        auto [route, vec] = dijkstra::dijkstra_algorithm(gr, 2, 1);
+        std::cout << route << std::endl;
+        for(const auto& el : vec)
+            std::cout << el << std::endl;
 //        std::cout <<std::endl;
 //        std::cout << dijkstra::dijkstra_algorithm(gr, 2, 1).first << std::endl;
 //        std::cout << dijkstra::dijkstra_algorithm(gr, 0, 1).first << std::endl;
