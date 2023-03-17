@@ -119,9 +119,10 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
     (++it_from)->second.value() = { 1, 0 };
 
     auto min_ver = std::min_element(gr.begin(), gr.end(),
-                                    [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> it1,
-                                       std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> it2) {
-                                        return it1.second.value().weight_node < it2.second.value().weight_node;
+                                    [](std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node1,
+                                       std::pair<dijkstra::node_name_t, dijkstra::graph_t::Node> node2) {
+                                        return (node1.second.value().weight_node < node2.second.value().weight_node)
+                                        && !node1.second.value().is_passed && !node2.second.value().is_passed;
                                     });
 
     return { 5, { 5 }};
