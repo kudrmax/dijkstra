@@ -1,6 +1,7 @@
 #include "dijkstra.h"
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 int main(int arg_count, char* arg_vars[]) {
     try {
@@ -13,16 +14,28 @@ int main(int arg_count, char* arg_vars[]) {
 //        dijkstra::route_t vec;
 //        auto pair = dijkstra::dijkstra_algorithm(gr, 0, 0);
 
-//        for (size_t i = 0; i < gr.size(); ++i) {
-//            for (size_t j = 0; j < gr.size(); ++j) {
-//                std::cout << i << " -> " << j << ": " << dijkstra::dijkstra_algorithm(gr, i, j).first << std::endl;
-//            }
-//            std::cout << std::endl;
-//        }
-        auto [route, vec] = dijkstra::dijkstra_algorithm(gr, 2, 1);
-        std::cout << route << std::endl;
-        for(const auto& el : vec)
-            std::cout << el << std::endl;
+        for (size_t i = 0; i < gr.size(); ++i) {
+            for (size_t j = 0; j < gr.size(); ++j) {
+                auto [route, vec] = dijkstra::dijkstra_algorithm(gr, i, j);
+                std::cout << i << " -> " << j << ": " << route << ", { ";
+                for (const auto& el: vec) {
+                    std::cout << el << " ";
+                }
+                std::cout << " }" << std::endl;
+            }
+            std::cout << std::endl;
+        }
+
+//        auto [route, vec] = dijkstra::dijkstra_algorithm(gr, 3, 2);
+//        std::cout << route << std::endl;
+//        for (const auto& el: vec)
+//            std::cout << el << " ";
+//
+//
+//        system("dot -Tpng graph.dot -o graph.png");
+        return 0;
+
+
 //        std::cout <<std::endl;
 //        std::cout << dijkstra::dijkstra_algorithm(gr, 2, 1).first << std::endl;
 //        std::cout << dijkstra::dijkstra_algorithm(gr, 0, 1).first << std::endl;

@@ -1,12 +1,9 @@
 #pragma once
 
-#include "/Users/kudr.max/CLionProjects/Graph/sources/graph.h"
+#include "graph/graph.h"
 #include <vector>
 #include <iostream>
 #include <optional>
-
-// прием с mutable норм?
-// какой тип сделать who_change? (аналог INF)
 
 namespace dijkstra {
     using node_name_t = typename std::size_t;

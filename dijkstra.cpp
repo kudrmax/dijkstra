@@ -146,13 +146,26 @@ dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_
         min_ver->second.value().is_passed = true;
     }
     auto route = gr.find(key_to);
+
     std::vector<node_name_t> vec;
 
-    for (auto it = gr.find(key_to); it != gr.find(key_from); it = gr.find(it->second.value().who_change.who)) {
+    for (auto it = gr.find(key_to); it != gr.find(key_from) || !it->second.value().who_change.is_changed; it = gr.find(
+            it->second.value().who_change.who)) {
+//        if (it != gr.find(key_to) && it != gr.find(key_from))
         vec.push_back(it->first);
+        if (!it->second.value().who_change.is_changed) break;
     }
-    vec.push_back(key_from);
+
     std::reverse(vec.begin(), vec.end());
+
+
+    if (route->second.value().weight_node == 0) {
+        vec.clear();
+        vec.push_back(gr.find(key_from)->first);
+    } else if (route->second.value().weight_node == INF) {
+        vec.clear();
+    }
+
     return { route->second.value().weight_node, vec };
 }
 
