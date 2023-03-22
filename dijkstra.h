@@ -30,5 +30,6 @@ namespace dijkstra {
     void print(const graph_t& gr) noexcept;
     void print(const node_pair_t& pair, std::string str = "") noexcept;
     void print(const NodeData&) noexcept;
+    void make_image(const graph_t& gr, const std::string& name);
 }
 

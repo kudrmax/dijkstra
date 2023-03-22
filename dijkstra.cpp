@@ -1,7 +1,7 @@
 #include "dijkstra.h"
 #include <sstream>
 #include <fstream>
-#include<functional>
+#include <functional>
 
 void dijkstra::print_results(weight_t weight, const route_t& route) {
     std::cout << "route:";
@@ -193,6 +193,39 @@ void dijkstra::print(const dijkstra::graph_t& gr) noexcept {
     }
     std::cout << std::endl;
 }
+
+void make_dot(const dijkstra::graph_t& gr, const std::string& dot) {
+    auto [route, vec] = dijkstra::dijkstra_algorithm(gr, 2, 1);
+    auto it_vec = vec.begin();
+    std::ofstream fout(dot);
+    fout << "digraph G {\n";
+    fout << "node [shape=circle style=filled]\n";
+    for (const auto& pair: gr) {
+        auto node_from = pair.first;
+        auto node = pair.second;
+        for (const auto& edge: node) {
+            const auto& node_to = edge.first;
+            fout << "\t" << node_from << " -> " << node_to << " [label = " << edge.second;
+            if (auto k_from = std::find(vec.begin(), vec.end(), node_from),
+                        k_to = std::find(vec.begin(), vec.end(), node_to);
+                    (++k_from) == k_to) {
+                fout << " color = red";
+            }
+            fout << "];\n";
+        }
+    }
+    fout << "}\n";
+}
+
+void dijkstra::make_image(const graph_t& gr, const std::string& name) {
+    std::string str_dot = "graph.dot";
+    std::string str;
+    str = "dot -Tpng " + str_dot + " -o " + name;
+    make_dot(gr, str_dot);
+    system("dot -Tpng graph.dot -o graph.png");
+//    system("dot -Tpng graph.dot -o graph.png");
+}
+
 
 
 
