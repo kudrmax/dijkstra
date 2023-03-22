@@ -194,8 +194,8 @@ void dijkstra::print(const dijkstra::graph_t& gr) noexcept {
     std::cout << std::endl;
 }
 
-void make_dot(const dijkstra::graph_t& gr, const std::string& dot) {
-    auto [route, vec] = dijkstra::dijkstra_algorithm(gr, 2, 1);
+void make_dot(const dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name_t node_1, dijkstra::node_name_t node_2) {
+    auto [route, vec] = dijkstra::dijkstra_algorithm(gr, node_1, node_2);
     auto it_vec = vec.begin();
     std::ofstream fout(dot);
     fout << "digraph G {\n";
@@ -214,22 +214,60 @@ void make_dot(const dijkstra::graph_t& gr, const std::string& dot) {
             fout << "];\n";
         }
     }
-    for (const auto& el : vec){
+    for (const auto& el: vec)
         fout << el << " [color = red fillcolor=lightgray];\n";
-//        fout << el << " [fillcolor=red style=filled];\n";
-    }
-//    fout << "1 [fillcolor=red style = filled];\n";
     fout << "}\n";
 }
 
+void make_dot(const dijkstra::graph_t& gr, const std::string& dot) {
+    std::ofstream fout(dot);
+    fout << "digraph G {\n";
+    fout << "node [shape=circle style=filled]\n";
+    for (const auto& pair: gr) {
+        auto node_from = pair.first;
+        auto node = pair.second;
+        for (const auto& edge: node) {
+            const auto& node_to = edge.first;
+            fout << "\t" << node_from << " -> " << node_to << " [label = " << edge.second;
+            fout << "];\n";
+        }
+    }
+    fout << "}\n";
+}
+
+void make_str_for_make_image() {
+
+}
+
 void dijkstra::make_image(const graph_t& gr, const std::string& name) {
+
     std::string str_dot = "graph.dot";
     std::string str;
     str = "dot -Tpng " + str_dot + " -o " + name;
+
     make_dot(gr, str_dot);
-    system("dot -Tpng graph.dot -o graph.png");
+
+    char str_c_style[str.length() + 1];
+    strcpy(str_c_style, str.c_str());
+
+    system(str_c_style);
 //    system("dot -Tpng graph.dot -o graph.png");
 }
+
+void dijkstra::make_image(const graph_t& gr, node_name_t node_1, node_name_t node_2, const std::string& name){
+    std::string str_dot = "graph.dot";
+    std::string str;
+    str = "dot -Tpng " + str_dot + " -o " + name;
+
+    make_dot(gr, str_dot, node_1, node_2);
+
+    char str_c_style[str.length() + 1];
+    strcpy(str_c_style, str.c_str());
+
+    system(str_c_style);
+//    system("dot -Tpng graph.dot -o graph.png");
+}
+
 
 
 
