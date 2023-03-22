@@ -214,6 +214,11 @@ void make_dot(const dijkstra::graph_t& gr, const std::string& dot) {
             fout << "];\n";
         }
     }
+    for (const auto& el : vec){
+        fout << el << " [color = red fillcolor=lightgray];\n";
+//        fout << el << " [fillcolor=red style=filled];\n";
+    }
+//    fout << "1 [fillcolor=red style = filled];\n";
     fout << "}\n";
 }
 

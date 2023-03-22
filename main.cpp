@@ -33,7 +33,10 @@ int main(int arg_count, char* arg_vars[]) {
 //
 //
 //        system("dot -Tpng graph.dot -o graph.png");
+//        dijkstra::make_image(gr, "graph.png", 2, 1);
         dijkstra::make_image(gr, "graph.png");
+
+
 
         gr.teest();
         return 0;
