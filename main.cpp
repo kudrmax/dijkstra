@@ -5,6 +5,8 @@
 
 int main(int arg_count, char* arg_vars[]) {
     try {
+        dijkstra::read_graph("file.txt");
+
         auto [file, from, to] = dijkstra::parse_args(arg_count, arg_vars);
         auto gr = dijkstra::read_graph(file);
 //        print(gr);
@@ -14,17 +16,17 @@ int main(int arg_count, char* arg_vars[]) {
 //        dijkstra::route_t vec;
 //        auto pair = dijkstra::dijkstra_algorithm(gr, 0, 0);
 
-//        for (size_t i = 0; i < gr.size(); ++i) {
-//            for (size_t j = 0; j < gr.size(); ++j) {
-//                auto [route, vec] = dijkstra::dijkstra_algorithm(gr, i, j);
-//                std::cout << i << " -> " << j << ": " << route << ", { ";
-//                for (const auto& el: vec) {
-//                    std::cout << el << " ";
-//                }
-//                std::cout << " }" << std::endl;
-//            }
-//            std::cout << std::endl;
-//        }
+        for (size_t i = 0; i < gr.size(); ++i) {
+            for (size_t j = 0; j < gr.size(); ++j) {
+                auto [route, vec] = dijkstra::dijkstra_algorithm(gr, i, j);
+                std::cout << i << " -> " << j << ": " << route << ", { ";
+                for (const auto& el: vec) {
+                    std::cout << el << " ";
+                }
+                std::cout << " }" << std::endl;
+            }
+            std::cout << std::endl;
+        }
 
 //        auto [route, vec] = dijkstra::dijkstra_algorithm(gr, 3, 2);
 //        std::cout << route << std::endl;
@@ -34,12 +36,12 @@ int main(int arg_count, char* arg_vars[]) {
 //
 //        system("dot -Tpng graph.dot -o graph.png");
 //        dijkstra::make_image(gr, "graph.png", 2, 1);
-        dijkstra::make_image(gr, 2, 1, "graph_dijkstra.png");
-        dijkstra::make_image(gr, "graph.png");
+//        dijkstra::make_image(gr, 2, 1, "graph_dijkstra.png");
+//        dijkstra::make_image(gr, "graph.png");
 
 
 
-        gr.teest();
+//        gr.teest();
         return 0;
 
 
