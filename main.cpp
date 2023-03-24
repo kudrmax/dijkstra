@@ -1,8 +1,4 @@
 #include "dijkstra.h"
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <cstdlib>
 
 int main(int arg_count, char* arg_vars[]) {
     try {
@@ -17,6 +13,4 @@ int main(int arg_count, char* arg_vars[]) {
         dijkstra::print(ex);
         return 1;
     }
-
-    return 0;
 }

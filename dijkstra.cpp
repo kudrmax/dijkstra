@@ -1,11 +1,8 @@
 #include "dijkstra.h"
+#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <functional>
-
-//void test_gtest(int x) {
-//    std::cout << "I'm here" << std::endl;
-//}
 
 void dijkstra::print_results(const weight_t& weight, const route_t& route) {
     std::cout << "route:";
@@ -16,7 +13,7 @@ void dijkstra::print_results(const weight_t& weight, const route_t& route) {
 }
 
 std::tuple<const char*, dijkstra::node_name_t, dijkstra::node_name_t>
-dijkstra::parse_args(int arg_count, char** arg_vars) {
+dijkstra::parse_args(int arg_count, char* arg_vars[]) {
     using namespace std::string_literals;
     if (arg_count != 7)
         throw std::runtime_error("Invalid number of arguments");
@@ -33,8 +30,8 @@ dijkstra::parse_args(int arg_count, char** arg_vars) {
             throw std::runtime_error("Duplicated argument: "s + arg_vars[i]);
         it->second = arg_vars[i + 1];
     }
-    size_t from;
-    size_t to;
+    dijkstra::node_name_t from;
+    dijkstra::node_name_t to;
     std::stringstream stream;
     stream << arg_map["--from"] << ' ' << arg_map["--to"];
     stream >> from >> to;
@@ -60,11 +57,10 @@ void add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row, si
     if (column - 1 != size_of_matrix)
         throw graph::GraphException("Matrix isn't square");
     if (!iss.eof())
-        throw graph::GraphException("Matrix isn't square");
+        throw graph::GraphException("Incorrect file");
 }
 
 size_t add_node_to_graph_from_string(dijkstra::graph_t& gr, std::string& str) {
-    const double INF = std::numeric_limits<double>::infinity();
     size_t column = 0;
     std::istringstream iss;
     iss.str(str);
@@ -91,8 +87,6 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
 
     int row = 0;
     std::string str;
-    size_t column_first = 0;
-    size_t column_this = 0;
     size_t size_of_matrix = 0;
 
     for (; std::getline(fin, str); ++row) {
@@ -145,6 +139,8 @@ void change_graph_for_dijkstra(dijkstra::graph_t& gr) {
             auto& weight_node_to = value_to.weight_node;
 
             const auto& weight = edge_pair.second;
+            if (weight < 0)
+                throw graph::GraphException("Graph has edge with weight < 0");
             auto sum = weight_node_from + weight;
 
             if (!value_to.is_passed && sum < weight_node_to) {
@@ -170,7 +166,6 @@ restore_route(const dijkstra::graph_t& gr, const dijkstra::node_name_t& key_from
         return vec;
     }
 
-
     auto it_from = gr.find(key_from);
     auto it_to = gr.find(key_to);
 
@@ -186,9 +181,13 @@ restore_route(const dijkstra::graph_t& gr, const dijkstra::node_name_t& key_from
 
 std::pair<dijkstra::weight_t, dijkstra::route_t>
 dijkstra::dijkstra_algorithm(graph_t& gr, const node_name_t& key_from, const node_name_t& key_to) {
+    if (gr.find(key_from) == gr.end() || gr.find(key_to) == gr.end())
+        throw graph::GraphException("There is no key");
     initialization_value(gr, key_from);
     change_graph_for_dijkstra(gr);
     auto route = gr.find(key_to)->second.value().weight_node;
+    if(route == std::numeric_limits<double>::infinity())
+        throw graph::GraphException("There is no route");
     auto vec = restore_route(gr, key_from, key_to, route);
     return { route, vec };
 }
@@ -237,7 +236,6 @@ void make_str_for_make_image() {
 }
 
 void dijkstra::make_image(const graph_t& gr, const std::string& name) {
-
     std::string str_dot = "graph.dot";
     std::string str;
     str = "dot -Tpng " + str_dot + " -o " + name;
@@ -251,7 +249,7 @@ void dijkstra::make_image(const graph_t& gr, const std::string& name) {
 //    system("dot -Tpng graph.dot -o graph.png");
 }
 
-void dijkstra::make_image(graph_t& gr, node_name_t node_1, node_name_t node_2, const std::string& name) {
+void dijkstra::make_image(graph_t& gr, const node_name_t& node_1, const node_name_t& node_2, const std::string& name) {
     std::string str_dot = "graph.dot";
     std::string str;
     str = "dot -Tpng " + str_dot + " -o " + name;

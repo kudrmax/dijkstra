@@ -2,8 +2,7 @@
 
 #include "graph/graph.h"
 #include <vector>
-#include <iostream>
-#include <optional>
+#include <string>
 
 namespace dijkstra {
     using node_name_t = typename std::size_t;
@@ -29,10 +28,6 @@ namespace dijkstra {
     std::pair<weight_t, route_t> dijkstra_algorithm(graph_t& graph, const node_name_t& key_from, const node_name_t& key_to);
     void print_results(const weight_t&, const route_t&);
     void make_image(const graph_t& gr, const std::string& name = "graph.png");
-    void make_image(graph_t& gr, node_name_t node_1, node_name_t node_2, const std::string& name = "graph.png");
+    void make_image(graph_t& gr, const node_name_t& node_1, const node_name_t& node_2, const std::string& name = "graph_dijkstra.png");
     void print(const std::exception& ex) noexcept;
 }
-
-//    void print(const graph_t& gr) noexcept;
-//    void print(const node_pair_t& pair, std::string str = "") noexcept;
-//    void print(const NodeData&) noexcept;
