@@ -196,19 +196,17 @@ dijkstra::dijkstra_algorithm(graph_t& gr, const node_name_t& key_from, const nod
 void make_dot(dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name_t node_1,
               dijkstra::node_name_t node_2) {
     auto [route, vec] = dijkstra::dijkstra_algorithm(gr, node_1, node_2);
-    auto it_vec = vec.begin();
     std::ofstream fout(dot);
     fout << "digraph G {\n";
     fout << "node [shape=circle style=filled]\n";
     for (const auto& pair: gr) {
-        const auto& node_from = pair.first;
-        const auto& node = pair.second;
-        for (const auto& edge: node) {
-            const auto& node_to = edge.first;
-            fout << "\t" << node_from << " -> " << node_to << " [label = " << edge.second;
-            if (auto k_from = std::find(vec.begin(), vec.end(), node_from),
-                        k_to = std::find(vec.begin(), vec.end(), node_to);
-                    *(++k_from) == *k_to /*&& vec.size() != 2 */){
+        const auto& key_from = pair.first;
+        for (const auto& edge: pair.second) {
+            const auto& key_to = edge.first;
+            fout << "\t" << key_from << " -> " << key_to << " [label = " << edge.second;
+            if (auto vec_el_from = std::find(vec.begin(), vec.end(), key_from),
+                        vec_el_to = std::find(vec.begin(), vec.end(), key_to);
+                    *(++vec_el_from) == *vec_el_to && vec_el_to != vec.end()) {
                 fout << " color = red";
             }
             fout << "];\n";
@@ -224,11 +222,10 @@ void make_dot(const dijkstra::graph_t& gr, const std::string& dot) {
     fout << "digraph G {\n";
     fout << "node [shape=circle style=filled]\n";
     for (const auto& pair: gr) {
-        auto node_from = pair.first;
-        auto node = pair.second;
-        for (const auto& edge: node) {
-            const auto& node_to = edge.first;
-            fout << "\t" << node_from << " -> " << node_to << " [label = " << edge.second;
+        const auto& key_from = pair.first;
+        for (const auto& edge: pair.second) {
+            const auto& key_to = edge.first;
+            fout << "\t" << key_from << " -> " << key_to << " [label = " << edge.second;
             fout << "];\n";
         }
     }
