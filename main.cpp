@@ -1,11 +1,20 @@
 #include "dijkstra.h"
 #include <iostream>
+#include <vector>
 #include <fstream>
 #include <cstdlib>
 
 int main(int arg_count, char* arg_vars[]) {
     try {
         dijkstra::read_graph("file.txt");
+
+        std::vector<int> vect = { 1, 2, 3 };
+        vect[0] = 11;
+        const std::vector<int> cvect = { 1, 2, 3 };
+        std::cout << cvect[0];
+        vect.at(4) = 11;
+        std::cout << cvect.at(4);
+
 
         auto [file, from, to] = dijkstra::parse_args(arg_count, arg_vars);
         auto gr = dijkstra::read_graph(file);
