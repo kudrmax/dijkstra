@@ -15,15 +15,8 @@ void dijkstra::print_results(weight_t weight, const route_t& route) {
     std::cout << "weight: " << weight << std::endl;
 }
 
-void delete_slashes(std::string& str) {
-    if (str.back() == '|' || str.back() == '/' || str.back() == '\\')
-        str.pop_back();
-    if (str.front() == '|' || str.front() == '/' || str.front() == '\\')
-        str.erase(str.begin());
-}
-
-std::tuple<const char*, dijkstra::node_name_t, dijkstra::node_name_t> dijkstra::parse_args(int arg_count,
-                                                                                           char** arg_vars) {
+std::tuple<const char*, dijkstra::node_name_t, dijkstra::node_name_t>
+dijkstra::parse_args(int arg_count, char** arg_vars) {
     using namespace std::string_literals;
     if (arg_count != 7)
         throw std::runtime_error("Invalid number of arguments");
@@ -56,7 +49,7 @@ void dijkstra::print(const std::exception& ex) noexcept {
 
 void add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row, size_t size_of_matrix) {
     if (row > size_of_matrix)
-        throw std::runtime_error("row > size_of_matrix");
+        throw graph::GraphException("Matrix isn't square");
     dijkstra::weight_t weight;
     size_t column = 0;
     std::istringstream iss;
@@ -65,11 +58,10 @@ void add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row, si
         if (weight != 0 && column <= size_of_matrix)
             gr.insert_edge({ row, column }, weight);
     if (column - 1 != size_of_matrix)
-        throw std::runtime_error("column != size_of_matrix");
+        throw graph::GraphException("Matrix isn't square");
     if (!iss.eof())
-        throw std::runtime_error("There is no correct symbol");
+        throw graph::GraphException("Matrix isn't square");
 }
-
 
 size_t add_node_to_graph_from_string(dijkstra::graph_t& gr, std::string& str) {
     const double INF = std::numeric_limits<double>::infinity();
@@ -78,8 +70,15 @@ size_t add_node_to_graph_from_string(dijkstra::graph_t& gr, std::string& str) {
     iss.str(str);
     dijkstra::weight_t weight;
     for (; iss >> weight; ++column)
-        gr.insert_node(column, { INF, 0, false });
+        gr.insert_node(column);
     return column - 1;
+}
+
+void delete_slashes(std::string& str) {
+    if (str.back() == '|' || str.back() == '/' || str.back() == '\\')
+        str.pop_back();
+    if (str.front() == '|' || str.front() == '/' || str.front() == '\\')
+        str.erase(str.begin());
 }
 
 dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
@@ -88,7 +87,7 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
 
     std::ifstream fin(file_name);
     if (!fin.is_open())
-        throw std::runtime_error("Can't open file named: "s + file_name);
+        throw graph::GraphException("Can't open file named: "s + file_name);
 
     int row = 0;
     std::string str;
@@ -103,7 +102,7 @@ dijkstra::graph_t dijkstra::read_graph(const char* file_name) {
         add_string_to_graph(gr, str, row, size_of_matrix);
     }
     if (row - 1 != size_of_matrix)
-        throw std::runtime_error("row < size_of_matrix");
+        throw graph::GraphException("Matrix isn't square");
     return gr;
 }
 
@@ -118,59 +117,80 @@ struct MyCompareForDijkstra {
     }
 };
 
-std::pair<dijkstra::weight_t, dijkstra::route_t>
-dijkstra::dijkstra_algorithm(const graph_t& gr, node_name_t key_from, node_name_t key_to) {
+void initialization_value(dijkstra::graph_t& gr, const dijkstra::node_name_t& key_from) {
     const double INF = std::numeric_limits<double>::infinity();
-    auto it_from_zero = gr.find(key_from);
-
-    for (const auto& pair: gr) {
+    for (auto& pair: gr) {
         pair.second.value().weight_node = INF;
         pair.second.value().is_passed = false;
-        pair.second.value().who_change = { false };
+        pair.second.value().who_change = dijkstra::node_data_t::who_change_t{ false };
     }
-    it_from_zero->second.value().weight_node = 0;
+    auto it_from = gr.find(key_from);
+    it_from->second.value().weight_node = 0;
+}
 
+void change_graph_for_dijkstra(dijkstra::graph_t& gr) {
     for (size_t i = 0; i < gr.size(); ++i) {
-        auto min_ver = std::min_element(gr.begin(), gr.end(), MyCompareForDijkstra());
-        for (const auto& edge_pair: min_ver->second) {
-            auto weight_of_edge_to = edge_pair.second;
-            auto from_edge = min_ver->first;
-            auto it_from = gr.find(from_edge);
-            auto weight_of_node_from = it_from->second.value().weight_node;
-            auto to_edge = edge_pair.first;
-            auto it_to = gr.find(to_edge);
-            auto& weight_of_node_to = it_to->second.value().weight_node;
-            auto sum = weight_of_node_from + weight_of_edge_to;
-            if (!it_to->second.value().is_passed && sum < weight_of_node_to) {
-                weight_of_node_to = sum;
-                it_to->second.value().who_change.is_changed = true;
-                it_to->second.value().who_change.who = it_from->first;
+
+        auto min_vertex = std::min_element(gr.begin(), gr.end(), MyCompareForDijkstra());
+
+        for (const auto& edge_pair: min_vertex->second.edge()) {
+
+            auto it_from = gr.find(min_vertex->first);
+            auto it_to = gr.find(edge_pair.first);
+
+            const auto& value_from = it_from->second.value();
+            auto& value_to = it_to->second.value();
+
+            const auto& weight_node_from = value_from.weight_node;
+            auto& weight_node_to = value_to.weight_node;
+
+            const auto& weight = edge_pair.second;
+            auto sum = weight_node_from + weight;
+
+            if (!value_to.is_passed && sum < weight_node_to) {
+                value_to.weight_node = sum;
+                value_to.who_change.is_changed = true;
+                value_to.who_change.who = it_from->first;
             }
         }
-        min_ver->second.value().is_passed = true;
+        min_vertex->second.value().is_passed = true;
     }
-    auto route = gr.find(key_to);
+}
 
-    std::vector<node_name_t> vec;
+dijkstra::route_t
+restore_route(const dijkstra::graph_t& gr, const dijkstra::node_name_t& key_from, const dijkstra::node_name_t& key_to,
+              const dijkstra::weight_t route) {
+    const double INF = std::numeric_limits<double>::infinity();
+    dijkstra::route_t vec;
 
-    for (auto it = gr.find(key_to); it != gr.find(key_from) || !it->second.value().who_change.is_changed; it = gr.find(
-            it->second.value().who_change.who)) {
-//        if (it != gr.find(key_to) && it != gr.find(key_from))
+    if (route == INF)
+        return vec;
+    else if (route == 0) {
+        vec.push_back(gr.find(key_from)->first);
+        return vec;
+    }
+
+
+    auto it_from = gr.find(key_from);
+    auto it_to = gr.find(key_to);
+
+    for (auto it = it_to;
+         it != it_from || !it->second.value().who_change.is_changed;
+         it = gr.find(it->second.value().who_change.who)) {
         vec.push_back(it->first);
         if (!it->second.value().who_change.is_changed) break;
     }
-
     std::reverse(vec.begin(), vec.end());
+    return vec;
+}
 
-
-    if (route->second.value().weight_node == 0) {
-        vec.clear();
-        vec.push_back(gr.find(key_from)->first);
-    } else if (route->second.value().weight_node == INF) {
-        vec.clear();
-    }
-
-    return { route->second.value().weight_node, vec };
+std::pair<dijkstra::weight_t, dijkstra::route_t>
+dijkstra::dijkstra_algorithm(graph_t& gr, const node_name_t& key_from, const node_name_t& key_to) {
+    initialization_value(gr, key_from);
+    change_graph_for_dijkstra(gr);
+    auto route = gr.find(key_to)->second.value().weight_node;
+    auto vec = restore_route(gr, key_from, key_to, route);
+    return { route, vec };
 }
 
 void dijkstra::print(const dijkstra::node_data_t& val) noexcept {
@@ -198,7 +218,7 @@ void dijkstra::print(const dijkstra::graph_t& gr) noexcept {
     std::cout << std::endl;
 }
 
-void make_dot(const dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name_t node_1,
+void make_dot(dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name_t node_1,
               dijkstra::node_name_t node_2) {
     auto [route, vec] = dijkstra::dijkstra_algorithm(gr, node_1, node_2);
     auto it_vec = vec.begin();
@@ -259,7 +279,7 @@ void dijkstra::make_image(const graph_t& gr, const std::string& name) {
 //    system("dot -Tpng graph.dot -o graph.png");
 }
 
-void dijkstra::make_image(const graph_t& gr, node_name_t node_1, node_name_t node_2, const std::string& name) {
+void dijkstra::make_image(graph_t& gr, node_name_t node_1, node_name_t node_2, const std::string& name) {
     std::string str_dot = "graph.dot";
     std::string str;
     str = "dot -Tpng " + str_dot + " -o " + name;
