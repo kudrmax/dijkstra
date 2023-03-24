@@ -27,12 +27,12 @@ namespace dijkstra {
     std::tuple<const char*, node_name_t, node_name_t> parse_args(int arg_count, char* arg_vars[]);
     graph_t read_graph(const char* file_name);
     std::pair<weight_t, route_t> dijkstra_algorithm(graph_t& graph, const node_name_t& key_from, const node_name_t& key_to);
-    void print_results(weight_t, const route_t&);
-    void print(const std::exception& ex) noexcept;
-    void print(const graph_t& gr) noexcept;
-    void print(const node_pair_t& pair, std::string str = "") noexcept;
-    void print(const NodeData&) noexcept;
+    void print_results(const weight_t&, const route_t&);
     void make_image(const graph_t& gr, const std::string& name = "graph.png");
     void make_image(graph_t& gr, node_name_t node_1, node_name_t node_2, const std::string& name = "graph.png");
+    void print(const std::exception& ex) noexcept;
 }
 
+//    void print(const graph_t& gr) noexcept;
+//    void print(const node_pair_t& pair, std::string str = "") noexcept;
+//    void print(const NodeData&) noexcept;

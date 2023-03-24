@@ -7,7 +7,7 @@
 //    std::cout << "I'm here" << std::endl;
 //}
 
-void dijkstra::print_results(weight_t weight, const route_t& route) {
+void dijkstra::print_results(const weight_t& weight, const route_t& route) {
     std::cout << "route:";
     for (auto const& key: route)
         std::cout << " " << key;
@@ -193,31 +193,6 @@ dijkstra::dijkstra_algorithm(graph_t& gr, const node_name_t& key_from, const nod
     return { route, vec };
 }
 
-void dijkstra::print(const dijkstra::node_data_t& val) noexcept {
-    std::cout << "{ " <<
-              val.weight_node << ", " <<
-              val.is_passed << ", " <<
-              val.who_change.who << " }";
-}
-
-void dijkstra::print(const node_pair_t& pair, std::string str) noexcept {
-    std::cout << str;
-    std::cout << pair.first << ": ";
-    print(pair.second.value());
-    std::cout << std::endl;
-//    for (auto const& edges: pair.second.get_edge()) {
-//        std::cout << " —> " << edges.first << " (" << edges.second << ")" << std::endl;
-//    }
-}
-
-void dijkstra::print(const dijkstra::graph_t& gr) noexcept {
-    std::cout << "GRAPHHH\n" << std::endl;
-    for (auto const& pair: gr) {
-        print(pair);
-    }
-    std::cout << std::endl;
-}
-
 void make_dot(dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name_t node_1,
               dijkstra::node_name_t node_2) {
     auto [route, vec] = dijkstra::dijkstra_algorithm(gr, node_1, node_2);
@@ -226,14 +201,14 @@ void make_dot(dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name
     fout << "digraph G {\n";
     fout << "node [shape=circle style=filled]\n";
     for (const auto& pair: gr) {
-        auto node_from = pair.first;
-        auto node = pair.second;
+        const auto& node_from = pair.first;
+        const auto& node = pair.second;
         for (const auto& edge: node) {
             const auto& node_to = edge.first;
             fout << "\t" << node_from << " -> " << node_to << " [label = " << edge.second;
             if (auto k_from = std::find(vec.begin(), vec.end(), node_from),
                         k_to = std::find(vec.begin(), vec.end(), node_to);
-                    (++k_from) == k_to) {
+                    *(++k_from) == *k_to /*&& vec.size() != 2 */){
                 fout << " color = red";
             }
             fout << "];\n";
