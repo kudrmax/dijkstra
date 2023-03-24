@@ -197,7 +197,7 @@ void make_dot(dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name
     auto [route, vec] = dijkstra::dijkstra_algorithm(gr, node_1, node_2);
     std::ofstream fout(dot);
     fout << "digraph G {\n";
-    fout << "node [shape=circle style=filled]\n";
+    fout << "node [shape=circle style=filled color=lightgrey ]\n";
     for (const auto& pair: gr) {
         const auto& key_from = pair.first;
         for (const auto& edge: pair.second) {
@@ -206,13 +206,14 @@ void make_dot(dijkstra::graph_t& gr, const std::string& dot, dijkstra::node_name
             if (auto vec_el_from = std::find(vec.begin(), vec.end(), key_from),
                         vec_el_to = std::find(vec.begin(), vec.end(), key_to);
                     *(++vec_el_from) == *vec_el_to && vec_el_to != vec.end()) {
-                fout << " color = red";
+                fout << " fillcolor=lightblue";
             }
+            else fout << " color=lightgrey fontcolor=lightgrey";
             fout << "];\n";
         }
     }
     for (const auto& el: vec)
-        fout << el << " [color = red fillcolor=lightgray];\n";
+        fout << el << " [ color = black fillcolor=lightblue];\n";
     fout << "}\n";
 }
 
