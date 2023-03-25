@@ -2,7 +2,9 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <functional>
+//#include <functional>
+#include <string.h>
+#include <stdexcept>
 
 void dijkstra::print_results(const weight_t& weight, const route_t& route) {
     std::cout << "route:";
@@ -54,10 +56,10 @@ void add_string_to_graph(dijkstra::graph_t& gr, std::string& str, size_t row, si
     for (; iss >> weight; ++column)
         if (weight != 0 && column <= size_of_matrix)
             gr.insert_edge({ row, column }, weight);
-    if (column - 1 != size_of_matrix)
-        throw graph::GraphException("Matrix isn't square");
     if (!iss.eof())
         throw graph::GraphException("Incorrect file");
+    if (column - 1 != size_of_matrix)
+        throw graph::GraphException("Matrix isn't square");
 }
 
 size_t add_node_to_graph_from_string(dijkstra::graph_t& gr, std::string& str) {
@@ -67,6 +69,8 @@ size_t add_node_to_graph_from_string(dijkstra::graph_t& gr, std::string& str) {
     dijkstra::weight_t weight;
     for (; iss >> weight; ++column)
         gr.insert_node(column);
+    if (!iss.eof())
+        throw graph::GraphException("Incorrect file");
     return column - 1;
 }
 
@@ -154,12 +158,10 @@ void change_graph_for_dijkstra(dijkstra::graph_t& gr) {
 }
 
 dijkstra::route_t
-restore_route(const dijkstra::graph_t& gr, const dijkstra::node_name_t& key_from, const dijkstra::node_name_t& key_to,
-              const dijkstra::weight_t route) {
-    const double INF = std::numeric_limits<double>::infinity();
+restore_route(const dijkstra::graph_t& gr, const dijkstra::node_name_t& key_from, const dijkstra::node_name_t& key_to) {
     dijkstra::route_t vec;
 
-    if (route == 0) {
+    if (key_from == key_to) {
         vec.push_back(gr.find(key_from)->first);
         return vec;
     }
@@ -186,7 +188,7 @@ dijkstra::dijkstra_algorithm(graph_t& gr, const node_name_t& key_from, const nod
     auto route = gr.find(key_to)->second.value().weight_node;
     if(route == std::numeric_limits<double>::infinity())
         throw graph::GraphException("There is no route");
-    auto vec = restore_route(gr, key_from, key_to, route);
+    auto vec = restore_route(gr, key_from, key_to);
     return { route, vec };
 }
 
@@ -230,36 +232,22 @@ void make_dot(const dijkstra::graph_t& gr, const std::string& dot) {
     fout << "}\n";
 }
 
-void make_str_for_make_image() {
-
-}
-
 void dijkstra::make_image(const graph_t& gr, const std::string& name) {
     std::string str_dot = "graph.dot";
     std::string str;
-    str = "dot -Tpng " + str_dot + " -o " + name;
-
     make_dot(gr, str_dot);
-
-    char str_c_style[str.length() + 1];
-    strcpy(str_c_style, str.c_str());
-
-    system(str_c_style);
-//    system("dot -Tpng graph.dot -o graph.png");
+    str = "dot -Tpng " + str_dot + " -o " + name;
+    system(str.c_str());
+    std::remove(str_dot.c_str());
 }
 
 void dijkstra::make_image(graph_t& gr, const node_name_t& node_1, const node_name_t& node_2, const std::string& name) {
     std::string str_dot = "graph.dot";
     std::string str;
-    str = "dot -Tpng " + str_dot + " -o " + name;
-
     make_dot(gr, str_dot, node_1, node_2);
-
-    char str_c_style[str.length() + 1];
-    strcpy(str_c_style, str.c_str());
-
-    system(str_c_style);
-//    system("dot -Tpng graph.dot -o graph.png");
+    str = "dot -Tpng " + str_dot + " -o " + name;
+    system(str.c_str());
+    std::remove(str_dot.c_str());
 }
 
 
