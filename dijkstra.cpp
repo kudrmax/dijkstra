@@ -159,9 +159,7 @@ restore_route(const dijkstra::graph_t& gr, const dijkstra::node_name_t& key_from
     const double INF = std::numeric_limits<double>::infinity();
     dijkstra::route_t vec;
 
-    if (route == INF)
-        return vec;
-    else if (route == 0) {
+    if (route == 0) {
         vec.push_back(gr.find(key_from)->first);
         return vec;
     }
