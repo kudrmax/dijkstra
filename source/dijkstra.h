@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graph/graph.h"
+#include "../graph/graph.h"
 #include <vector>
 #include <string>
 

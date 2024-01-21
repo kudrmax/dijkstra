@@ -1,4 +1,4 @@
-#include "dijkstra.h"
+#include "../../source/dijkstra.h"
 #include <gtest/gtest.h>
 
 using graph_t = typename dijkstra::graph_t;

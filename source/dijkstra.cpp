@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-//#include <functional>
 #include <string.h>
 #include <stdexcept>
 
