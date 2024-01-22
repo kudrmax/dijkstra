@@ -24,4 +24,4 @@
 
 ## Контакты
 
-Макс Кудряшов - [GitHub](https://github.com/kudrmax) - [Telegram](t.me/kudrmax)
+Макс Кудряшов - [GitHub](https://github.com/kudrmax) - [Telegram](https://t.me/kudrmax)
